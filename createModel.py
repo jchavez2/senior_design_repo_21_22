@@ -9,7 +9,8 @@ from tensorflow.keras.metrics import categorical_crossentropy
 
 
 #get the image dataset
-train_data_dir = 
+trainDataDir = "trainingSets/testSet" #input the training directory
+#trainLabels = 
 
 #we probably want to do supervised learning if we want to only test out on a few tools
     #it would be cool ot see where the model determines what bojects look similar under unsupervised training
@@ -28,7 +29,7 @@ train_data_dir =
     #dropout: lower the amount of nodes being sued for the model
 
 epochs = 10;#for now this is what I decided. We'll see if this stays
-batch_size = 5 #see above
+batchSize = 2 #see above
 
 #create the model
 model = Sequential([
@@ -50,11 +51,11 @@ model = Sequential([
 
 #compile the model
 model.compile(
-    optimizer = Adam(learning_rate = .0001), 
+    optimizer = 'rmsprop'(learning_rate = .0001), 
     loss = 'sparse_categorical_crossentropy', 
     metrics=['accuracy']
 )
-#use Adam for now. Spare as our loss function to deal with integers. 
+#use Adam for now, look around for different optimizers. Spare as our loss function to deal with integers. 
 #we optimize the weights using some optimizer, 
     #SGD, a specific optimizer, job is to minimize loss per epoch
 #we can add a learning rate to quicken the minimaztion of loss
@@ -64,11 +65,14 @@ model.compile(
 #train the model
 model.fit(
     x=training_samples, 
-    y=train_labels, 
-    batch_size=10, 
+#    y=train_labels, 
+    batch_size=batchSize, 
     epochs=epochs,
     shuffle = True, #shuffle the data FIRST before training 
     verbose=2
 )
 
 #we can add backpropogation to adjust the weights of previous layers(?) to minimize loss as well
+
+model.summary()
+model.save('testmodel.h5')
