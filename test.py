@@ -1,5 +1,7 @@
 
 #from keras.utils import plot_model
+import os
+os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin")
 import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense
@@ -7,6 +9,8 @@ from keras.layers import Flatten
 from keras.layers import Conv2D
 from keras.layers import MaxPooling2D
 from keras.preprocessing.image import ImageDataGenerator 
+
+
 '''
 Step 1. Define network
 1st layer is input layer - nodes = 
@@ -16,14 +20,13 @@ Last layer is output layer - nodes = num of predictions
 We will need a CNN since we are doing image classification
 
 '''
-
+'''
 gpus = tf.config.experimental.list_physical_devices('GPU')
 
 #tf.config.experimental.set_memory_growth(gpus[0], True)
-
-print("AHHHHHH")
-print(tf.config.list_physical_devices())
-print(len(gpus))
+the above 2 lines do NOT work with this laptop becase CUDA is an nvidia only thig
+but lets try the CPU
+'''
 
 
 imgWidth = 32
