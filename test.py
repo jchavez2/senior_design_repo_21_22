@@ -1,7 +1,6 @@
 
 #from keras.utils import plot_model
-import os
-os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin")
+
 import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense
@@ -9,6 +8,7 @@ from keras.layers import Flatten
 from keras.layers import Conv2D
 from keras.layers import MaxPooling2D
 from keras.preprocessing.image import ImageDataGenerator 
+import numpy as np
 
 
 '''
@@ -29,8 +29,8 @@ but lets try the CPU
 '''
 
 
-imgWidth = 32
-imgHeight = 32
+imgWidth = 255
+imgHeight = 255
 
 model = Sequential()
 '''
@@ -49,7 +49,7 @@ model.add(Flatten())
 model.add(Dense(64, activation='relu'))
 '''
 model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform',
-padding='same', input_shape=(32, 32, 3)))
+padding='same', input_shape=(imgWidth, imgHeight, 3))) #we might have to mess with the input shape
 model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform',
 padding='same'))
 model.add(MaxPooling2D((2, 2)))
@@ -66,7 +66,8 @@ model.add(MaxPooling2D((2, 2)))
 model.add(Flatten())
 model.add(Dense(128, activation='relu', kernel_initializer='he_uniform'))
 
-model.add(Dense(2, activation = 'softmax'))
+model.add(Dense(3, activation = 'softmax')) #neurons here should be the amount of classes that are being determined
+#(in this case there is Screwdriver, wrench, and yourmom)
 
 #summarize layers
 model.summary()
@@ -100,16 +101,33 @@ an iterator is needed to progressively load images, so flow from directory and s
         subdirectories are labeled with images, for example if subdir blue comes before red alphabetically then blue=0 red = 1
 '''
 print("PREGENERATE")
-datagen = ImageDataGenerator()
+datagen = ImageDataGenerator(rescale=1./255) #rescale added
 
 trainDirectory = "data/train"
+trainLagels = np.array([ [1], [1], [1], [1], [1], [1], [1] ])
+#train_labels = "data/train/labels.txt" this hould be a type <class 'numpy.ndarray'>
+#it is a numpy matrix. Each index is a list that contains the label information. For now we will make a simple matrix where aeach index is a single eelement list containing a value indiciativw of the label name. I.e. Screwdriver = 0, Wrench = 1 etc..
+trainLabels = ['Screwdriver', 'Wrench', 'Yourmom']
 validationDirectory = "data/validation"
+
 testDirectory = "data/test"
 
-trainIterator = datagen.flow_from_directory(trainDirectory, class_mode = 'categorical', batch_size = 4)
-#we do the same for test and validation
 
-validationIterator = datagen.flow_from_directory(validationDirectory, class_mode = 'categorical', batch_size = 4)
+trainIterator = datagen.flow_from_directory(
+                                              trainDirectory,
+                                              target_size = (imgWidth, imgHeight), 
+                                              class_mode = 'categorical', 
+                                              batch_size = 4
+                                            )
+#we do the same for test and validation
+#maybe it would be easier to convert the images into a numpy array
+
+validationIterator = datagen.flow_from_directory(
+                                                  validationDirectory,
+                                                  target_size = (imgWidth, imgHeight), 
+                                                  class_mode = 'categorical', 
+                                                  batch_size = 4
+                                                 )
 
 testIterator = datagen.flow_from_directory(testDirectory, class_mode = 'categorical', batch_size = 4)
 
@@ -139,15 +157,19 @@ print("PREFITTED")
 steps = 2 #DirectorySize / 16 #see above for 16, Directorysize is not an actual vaariable, but rarther what the anticipated amoun tis
 
 model.fit(  trainIterator, #this will be the training set
-            batch_size = 1,
-            epochs = 1,
-            shuffle = True,
+            #batch_size = 1,
+            #steps_per_epoch = steps, #should be auto calculated (https://stackoverflow.com/questions/69727170/how-to-fix-invalidargumenterror-logits-and-labels-must-be-broadcastable-logits)
+            epochs = 10,
+            #shuffle = True,
             verbose = 2,
-            steps_per_epoch = steps,
-            validation_steps = 0)
+            #validation_steps = 0 #should be auto calculated
+            validation_data = validationIterator
+          )
 '''
 model.fit_generator(    trainIterator,
-                        steps_per_epoch = steps
+                        steps_per_epoch = steps,
+                        epochs = 2,
+                        verbose = 2
                         )
                         #may need to include validation data
                         #validation_data = validationIterator
