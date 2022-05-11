@@ -6,7 +6,7 @@ from keras.layers import Dense
 from keras.layers import Flatten
 from keras.layers import Conv2D
 from keras.layers import MaxPooling2D
-from keras.preprocessing.image import ImageDataGenerator 
+from keras.preprocessing.image import ImageDataGenerator
 '''
 Step 1. Define network
 1st layer is input layer - nodes = 
@@ -46,28 +46,28 @@ model.add(Flatten())
 model.add(Dense(64, activation='relu'))
 '''
 model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform',
-padding='same', input_shape=(32, 32, 3)))
+                 padding='same', input_shape=(32, 32, 3)))
 model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform',
-padding='same'))
+                 padding='same'))
 model.add(MaxPooling2D((2, 2)))
 model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform',
-padding='same'))
+                 padding='same'))
 model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform',
-padding='same'))
+                 padding='same'))
 model.add(MaxPooling2D((2, 2)))
 model.add(Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_uniform',
-padding='same'))
+                 padding='same'))
 model.add(Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_uniform',
-padding='same'))
+                 padding='same'))
 model.add(MaxPooling2D((2, 2)))
 model.add(Flatten())
 model.add(Dense(128, activation='relu', kernel_initializer='he_uniform'))
 
-model.add(Dense(2, activation = 'softmax'))
+model.add(Dense(2, activation='softmax'))
 
-#summarize layers
+# summarize layers
 model.summary()
-#plot graph
+# plot graph
 #plot_model(model, to_file = 'CNN.png')
 
 '''
@@ -78,10 +78,10 @@ loss will use multiclass - multiclass logarithmmic loss or categorical
 metrics will be accuracy, and have the result be stored in an array []
 '''
 print("PRECOMPILE")
-model.compile(  optimizer = 'rmsprop', 
-                loss = 'categorical_crossentropy', 
-                metrics = ['accuracy']) 
-                
+model.compile(optimizer='rmsprop',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+
 '''
 Step 3. Fit the network
 '''
@@ -103,12 +103,15 @@ trainDirectory = "data/train"
 validationDirectory = "data/validation"
 testDirectory = "data/test"
 
-trainIterator = datagen.flow_from_directory(trainDirectory, class_mode = 'categorical', batch_size = 4)
-#we do the same for test and validation
+trainIterator = datagen.flow_from_directory(
+    trainDirectory, class_mode='categorical', batch_size=4)
+# we do the same for test and validation
 
-validationIterator = datagen.flow_from_directory(validationDirectory, class_mode = 'categorical', batch_size = 4)
+validationIterator = datagen.flow_from_directory(
+    validationDirectory, class_mode='categorical', batch_size=4)
 
-testIterator = datagen.flow_from_directory(testDirectory, class_mode = 'categorical', batch_size = 4)
+testIterator = datagen.flow_from_directory(
+    testDirectory, class_mode='categorical', batch_size=4)
 
 '''
 Step 3.15 Normal Fitting
@@ -133,15 +136,15 @@ steps_per_epoch is num of images in dataset / (batch_size (from flow_from_direct
     validation_steps is teh same process 
 '''
 print("PREFITTED")
-steps = 2 #DirectorySize / 16 #see above for 16, Directorysize is not an actual vaariable, but rarther what the anticipated amoun tis
+steps = 2  # DirectorySize / 16 #see above for 16, Directorysize is not an actual vaariable, but rarther what the anticipated amoun tis
 
-model.fit(  trainIterator, #this will be the training set
-            batch_size = 1,
-            epochs = 1,
-            shuffle = True,
-            verbose = 2,
-            steps_per_epoch = steps,
-            validation_steps = 0)
+model.fit(trainIterator,  # this will be the training set
+          batch_size=1,
+          epochs=1,
+          shuffle=True,
+          verbose=2,
+          steps_per_epoch=steps,
+          validation_steps=0)
 '''
 model.fit_generator(    trainIterator,
                         steps_per_epoch = steps
@@ -163,7 +166,7 @@ where steps defines number of batches of samples to step through
 
 accuracy = model.evaluate(X, Y)
 '''
-#steps = def num of batches of samples to step through when eval model before stopping
+# steps = def num of batches of samples to step through when eval model before stopping
 #evaluated = model.evaluate_generator(testIterator, steps = 5)
 '''
 Step 5. Make Predicitions
@@ -176,5 +179,4 @@ We can use predict_classes for multiclass problems which will automatically conv
 predictions = model.predict(Z)
 predictions = model.predict_classes(Z) 
 '''
-#predicted = model.predict_generator(, steps = 20)
-
+# predicted = model.predict_generator(, steps = 20)
